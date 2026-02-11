@@ -9,7 +9,7 @@ import(
 func main(){
 	cfg, err := config.NewConfig()
 	if err != nil{
-		fmt.Printf("error: %w", err)
+		fmt.Println(err)
 		return
 	}
 	fmt.Println(cfg)

@@ -13,19 +13,13 @@ type Config struct{
 	PostgresPassword string `env:"POSTGRES_PASSWORD"`
 	PostgresPort int `env:"POSTGRES_PORT"`
 	PostgresHost string `env:"POSTGRES_HOST"`
-}
 
-
-func initEnv() error {
-	if err := godotenv.Load(); err != nil{
-		return fmt.Errorf("failed to get Envs: %w", err)
-	}
-	return nil
+	DirPath string `env:"DIR_PATH"`
 }
 
 func NewConfig() (*Config, error) {
-	if err := initEnv(); err != nil{
-		return nil, fmt.Errorf("initEnv: %w", err)
+	if err := godotenv.Load(); err != nil{
+		return nil, fmt.Errorf("Load: %w", err)
 	}
 
 	var cfg Config
