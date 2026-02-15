@@ -1,29 +1,46 @@
 package main
 
-import(
-	"file-manager/internal/config"
-	"file-manager/internal/parser"
-	"file-manager/internal/report"
-	"log"
-	
+import (
 	"context"
+	"file-manager/internal/config"
+	"file-manager/internal/poller"
+	"file-manager/internal/worker"
+	"log"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
 )
 
+func main() {
+	rootCtx := context.Background()
 
-func main(){
+	pollerCtx, cancel := context.WithCancel(rootCtx)
+	filesQueue := make(chan string)
+
+	log.Println("Начало программы")
+
 	cfg, err := config.NewConfig()
-	if err != nil{
-		log.Fatal(cfg, err)
+	if err != nil {
+		log.Fatal("failed to get config: ", err)
 		return
 	}
-	
-	parsedFile, err := parser.ParseTSVFile("test_file.tsv")
-	if err != nil{
-		log.Fatal(err)
-	}
 
-	err = report.CreateReportsFromFile(parsedFile, cfg.DirPath)
-	if err != nil{
-		log.Fatal(err)
-	}
+	go poller.ScanDirectory(cfg.TSVDirPath, pollerCtx, filesQueue, cfg.PollinInterval)
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go worker.Work(filesQueue, cfg.ReportsDirPath, cfg.TSVDirPath, &wg)
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+
+	go func() {
+		<-sigChan
+		log.Println("Завершение...")
+		cancel()
+	}()
+
+	wg.Wait()
+	log.Println("Конец")
 }
