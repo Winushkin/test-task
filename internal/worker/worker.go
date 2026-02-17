@@ -29,7 +29,9 @@ func Work(
 			appLogger.Fatal(ctx, fmt.Sprintf("ParseTSVFile: %v", err))
 		}
 
-		report.CreateReportsFromFile(records, cfg.ReportsDirPath)
+		if err = report.CreateReportsFromFile(records, cfg.ReportsDirPath); err != nil {
+			appLogger.Fatal(ctx, fmt.Sprintf("CreateReportsFromFile: %v", err))
+		}
 
 		fileID, err := pgRepo.InsertProcessedFile(ctx, filename)
 		if err != nil {
