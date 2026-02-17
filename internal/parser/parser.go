@@ -3,33 +3,12 @@ package parser
 
 import (
 	"encoding/csv"
+	"file-manager/internal/entities"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
 )
-
-type Record struct {
-	Number       string `info:"Номер записи в файле"`
-	Mqtt         string `info:"mqtt"`
-	InvID        string `info:"Инвентарный id"`
-	UnitGUID     string `info:"ID Записи"`
-	MessageID    string `info:"ID сообщения"`
-	MessageText  string `info:"Текст сообщения"`
-	Context      string `info:"Среда"`
-	MessageClass string `info:"Класс сообщения"`
-	MessageLevel string `info:"Уровень сообщения"`
-	Area         string `info:"Зона переменных"`
-	VarAddress   string `info:"Адрес переменной в контроллере"`
-	Block        string `info:"Начало блока"`
-	MessageType  string `info:"Тип"`
-	BitNumber    string `info:"Номер бита в регистре"`
-	InvertBit    string `info:"-"`
-}
-
-type TSVFile struct {
-	fields []Record
-}
 
 func readTSVFile(filename string) ([][]string, error) {
 	file, err := os.Open(filename)
@@ -49,7 +28,7 @@ func readTSVFile(filename string) ([][]string, error) {
 	return fileData, nil
 }
 
-func ParseTSVFile(filename string) ([]Record, error) {
+func ParseTSVFile(filename string) ([]entities.Record, error) {
 	ext := filepath.Ext(filename)
 	if ext != ".tsv" {
 		return nil, fmt.Errorf("Ext: incorrect file extension: expected: tsv, got: %s", ext)
@@ -60,14 +39,13 @@ func ParseTSVFile(filename string) ([]Record, error) {
 		return nil, fmt.Errorf("readTSVFile: %w", err)
 	}
 
-	recordArr := make([]Record, 0)
+	recordArr := make([]entities.Record, 0)
 
 	for _, line := range fileArr {
-		if _, err := strconv.Atoi(line[0]); err != nil{
+		if _, err := strconv.Atoi(line[0]); err != nil {
 			continue // скип первых строк с неймами атрибутов
 		}
-
-		record := Record{
+		record := entities.Record{
 			Number:       line[0],
 			Mqtt:         line[1],
 			InvID:        line[2],

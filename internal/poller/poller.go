@@ -3,16 +3,15 @@ package poller
 
 import (
 	"context"
-	"log"
+	"file-manager/internal/config"
+	"file-manager/internal/logger"
+	"file-manager/internal/repository"
+	"fmt"
 	"os"
 	"path/filepath"
 	"slices"
 	"time"
 )
-
-func mockGetFiles() []string {
-	return []string{}
-}
 
 func filterFiles(entries []os.DirEntry, processedFiles []string) []string {
 	files := make([]string, 0)
@@ -33,12 +32,14 @@ func filterFiles(entries []os.DirEntry, processedFiles []string) []string {
 }
 
 func ScanDirectory(
-	dirPath string,
 	ctx context.Context,
 	filesPipe chan<- string,
-	interval int,
+	pgRepo *repository.Postgres,
 ) {
-	ticker := time.NewTicker(time.Duration(interval) * time.Second)
+	cfg := ctx.Value(logger.ConfigKey).(*config.Config)
+	appLogger := ctx.Value(logger.LoggerKey).(*logger.Logger)
+
+	ticker := time.NewTicker(time.Duration(cfg.PollingInterval) * time.Second)
 	defer ticker.Stop()
 	defer close(filesPipe)
 
@@ -48,15 +49,18 @@ func ScanDirectory(
 			return
 
 		case <-ticker.C:
-			entries, err := os.ReadDir(dirPath)
+			entries, err := os.ReadDir(cfg.TSVDirPath)
 			if err != nil {
-				log.Fatal("failed to scan directory:", err)
 			}
 
-			processedFiles := mockGetFiles()
+			processedFiles, err := pgRepo.GetProcessedFiles(ctx)
+			if err != nil {
+				appLogger.Fatal(ctx, fmt.Sprintf("GetProcessedFiles: %v", err))
+			}
+
 			newTSVFiles := filterFiles(entries, processedFiles)
 			if amount := len(newTSVFiles); amount > 0 {
-				log.Printf("Найдено %d новых файлов", amount)
+				appLogger.Info(ctx, fmt.Sprintf("Найдено %d новых файлов", amount))
 			}
 			for _, filename := range newTSVFiles {
 				filesPipe <- filename
