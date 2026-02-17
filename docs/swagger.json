@@ -1,0 +1,134 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API for viewing TSV files",
+        "title": "Records Service API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/routers": {
+            "get": {
+                "description": "Returns paginated list of records",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "record"
+                ],
+                "summary": "Get records",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.GetRecordsResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "entities.Record": {
+            "type": "object",
+            "properties": {
+                "area": {
+                    "type": "string"
+                },
+                "bitNumber": {
+                    "type": "string"
+                },
+                "block": {
+                    "type": "string"
+                },
+                "context": {
+                    "type": "string"
+                },
+                "fileID": {
+                    "type": "integer"
+                },
+                "invID": {
+                    "type": "string"
+                },
+                "invertBit": {
+                    "type": "string"
+                },
+                "messageClass": {
+                    "type": "string"
+                },
+                "messageID": {
+                    "type": "string"
+                },
+                "messageLevel": {
+                    "type": "string"
+                },
+                "messageText": {
+                    "type": "string"
+                },
+                "messageType": {
+                    "type": "string"
+                },
+                "mqtt": {
+                    "type": "string"
+                },
+                "number": {
+                    "type": "string"
+                },
+                "unitGUID": {
+                    "type": "string"
+                },
+                "varAddress": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.GetRecordsResponse": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "records": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.Record"
+                    }
+                },
+                "total_pages": {
+                    "type": "integer"
+                },
+                "total_records": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}
