@@ -25,26 +25,6 @@ TSV Processing Service — это backend-сервис на Go, который:
 ---
 
 ## 📂 Структура проекта
-.
-├── cmd/
-│   └── main.go
-├── internal/
-│   ├── api/
-│   ├── config/
-│   ├── db/
-│   ├── models/
-│   ├── repository/
-│   ├── service/
-│   ├── parser/
-│   ├── worker/
-│   └── generator/
-├── docs/               # Swagger docs
-├── migrations/
-├── input/              # Входные .tsv файлы
-├── output/             # Сгенерированные PDF
-├── docker-compose.yml
-├── Dockerfile
-└── README.md
 
 ````
 ├── cmd
@@ -115,6 +95,7 @@ LOG_DIR_PATH=./logs
 
 ### 1️⃣ Через Docker (рекомендуется)
 ```bash
+  git clone https://github.com/Winushkin/test-task.git
   make start
   make up
 ```
@@ -131,7 +112,8 @@ http://localhost:8080/swagger
 После чего файлы будут доступны для просмотра в папке backup
 
 ### 2️⃣ Локальный запуск
-```bash 
+```bash
+  git clone https://github.com/Winushkin/test-task.git
   make start
   make pg-up
   go mod tidy
