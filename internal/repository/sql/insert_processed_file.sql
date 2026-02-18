@@ -1,0 +1,1 @@
+INSERT INTO processed_files (filename) VALUES ($1) RETURNING id;

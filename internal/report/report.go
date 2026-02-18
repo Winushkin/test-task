@@ -2,7 +2,7 @@
 package report
 
 import (
-	"file-manager/internal/parser"
+	"file-manager/internal/entities"
 	"fmt"
 	"reflect"
 
@@ -12,7 +12,7 @@ import (
 const fontFilePath = "./internal/report/fonts/TikTokSans_18pt_Condensed-Bold.ttf"
 const eightSpaces = "        "
 
-func CreateReportsFromFile(records []parser.Record, dirPath string) error {
+func CreateReportsFromFile(records []entities.Record, dirPath string) error {
 	for _, record := range records {
 		err := createReport(record, dirPath)
 		if err != nil {
@@ -30,7 +30,7 @@ func createPdfTemplate() fpdf.Pdf {
 	return pdf
 }
 
-func createReport(record parser.Record, dirPath string) error {
+func createReport(record entities.Record, dirPath string) error {
 	pdf := createPdfTemplate()
 
 	t := reflect.TypeOf(record)
