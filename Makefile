@@ -1,4 +1,5 @@
 start:
+	cp env.example .env
 	mkdir ./logs ./reports
 
 pg-up:

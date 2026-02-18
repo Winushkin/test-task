@@ -26,6 +26,10 @@ services:
     volumes:
       - ./tsv_files:/app/tsv_files
       - ./reports:/app/reports
+    environment:
+      - POSTGRES_HOST=tsv_postgresql
+    env_file:
+      - .env
     networks:
       - app_net
 

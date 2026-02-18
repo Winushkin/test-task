@@ -9,7 +9,7 @@ import (
 	"codeberg.org/go-pdf/fpdf"
 )
 
-const fontFilePath = "./internal/report/fonts/TikTokSans_18pt_Condensed-Bold.ttf"
+const fontFilePath = "./internal/report/fonts/pdfFont.ttf"
 const eightSpaces = "        "
 
 func CreateReportsFromFile(records []entities.Record, dirPath string) error {
