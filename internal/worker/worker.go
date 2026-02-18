@@ -2,41 +2,48 @@
 package worker
 
 import (
+	"context"
+	"file-manager/internal/config"
+	"file-manager/internal/logger"
 	"file-manager/internal/parser"
 	"file-manager/internal/report"
+	"file-manager/internal/repository"
 	"fmt"
-	"log"
 	"sync"
 )
 
-func mockSaveRecord(_ parser.Record) error {
-	// mock funcs for DB record saving
-	return nil
-}
-
-func mockSaveFile(_ string) error {
-	// mock funcs for DB Save Funcs for processed tsv files
-	return nil
-}
-
-func Work(filePipe <-chan string, reportDir, tsvDir string, wg *sync.WaitGroup) {
+func Work(
+	ctx context.Context,
+	filePipe <-chan string,
+	wg *sync.WaitGroup,
+	pgRepo *repository.Postgres,
+) {
 	defer wg.Done()
+
+	cfg := ctx.Value(logger.ConfigKey).(*config.Config)
+	appLogger := ctx.Value(logger.LoggerKey).(*logger.Logger)
+
 	for filename := range filePipe {
-		records, err := parser.ParseTSVFile(fmt.Sprintf("%s/%s", tsvDir, filename))
+		records, err := parser.ParseTSVFile(fmt.Sprintf("%s/%s", cfg.TSVDirPath, filename))
 		if err != nil {
-			log.Fatal("ParseTSVFile:", err)
+			appLogger.Fatal(ctx, fmt.Sprintf("ParseTSVFile: %v", err))
 		}
 
-		report.CreateReportsFromFile(records, reportDir)
+		if err = report.CreateReportsFromFile(records, cfg.ReportsDirPath); err != nil {
+			appLogger.Fatal(ctx, fmt.Sprintf("CreateReportsFromFile: %v", err))
+		}
+
+		fileID, err := pgRepo.InsertProcessedFile(ctx, filename)
+		if err != nil {
+			appLogger.Fatal(ctx, fmt.Sprintf("InsertProcessedFile: %v", err))
+
+		}
 
 		for _, record := range records {
-			if err = mockSaveRecord(record); err != nil {
-				log.Fatal("mockSaveRecord:", err)
+			record.FileID = fileID
+			if err = pgRepo.InsertRecord(ctx, record); err != nil {
+				appLogger.Fatal(ctx, fmt.Sprintf("InsertRecord: %v", err))
 			}
-		}
-
-		if err = mockSaveFile(filename); err != nil {
-			log.Fatal("mockSaveFile:", err)
 		}
 	}
 }

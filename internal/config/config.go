@@ -4,19 +4,18 @@ package config
 import (
 	"fmt"
 
+	"file-manager/internal/postgres"
+
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/joho/godotenv"
 )
 
 type Config struct {
-	PostgresUser     string `env:"POSTGRES_USER"`
-	PostgresName     string `env:"POSTRGES_NAME"`
-	PostgresPassword string `env:"POSTGRES_PASSWORD"`
-	PostgresPort     int    `env:"POSTGRES_PORT"`
-	PostgresHost     string `env:"POSTGRES_HOST"`
-	ReportsDirPath   string `env:"REPORT_DIR_PATH"`
-	TSVDirPath       string `env:"TSV_DIR_PATH"`
-	PollinInterval   int    `env:"POLLING_SECONDS_INTERVAL"`
+	PostgresCfg     postgres.Config `env-prefix:"POSTGRES_"`
+	ReportsDirPath  string          `env:"REPORT_DIR_PATH"`
+	TSVDirPath      string          `env:"TSV_DIR_PATH"`
+	LogDIRPath      string          `env:"LOG_DIR_PATH"`
+	PollingInterval int             `env:"POLLING_SECONDS_INTERVAL"`
 }
 
 func NewConfig() (*Config, error) {

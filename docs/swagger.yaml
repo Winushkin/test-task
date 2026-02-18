@@ -1,0 +1,88 @@
+basePath: /
+definitions:
+  entities.Record:
+    properties:
+      area:
+        type: string
+      bitNumber:
+        type: string
+      block:
+        type: string
+      context:
+        type: string
+      fileID:
+        type: integer
+      invID:
+        type: string
+      invertBit:
+        type: string
+      messageClass:
+        type: string
+      messageID:
+        type: string
+      messageLevel:
+        type: string
+      messageText:
+        type: string
+      messageType:
+        type: string
+      mqtt:
+        type: string
+      number:
+        type: string
+      unitGUID:
+        type: string
+      varAddress:
+        type: string
+    type: object
+  handlers.GetRecordsResponse:
+    properties:
+      limit:
+        type: integer
+      page:
+        type: integer
+      records:
+        items:
+          $ref: '#/definitions/entities.Record'
+        type: array
+      total_pages:
+        type: integer
+      total_records:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API for viewing TSV files
+  title: Records Service API
+  version: "1.0"
+paths:
+  /routers:
+    get:
+      consumes:
+      - application/json
+      description: Returns paginated list of records
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.GetRecordsResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get records
+      tags:
+      - record
+swagger: "2.0"
